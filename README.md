@@ -11,7 +11,6 @@
 - TypeScript (プログラミング言語)
 - Tailwind CSS (CSSフレームワーク)
 - Material-UI (Reactコンポーネントライブラリ)
-- next-intl (国際化ライブラリ)
 
 ## インストールとセットアップ
 
