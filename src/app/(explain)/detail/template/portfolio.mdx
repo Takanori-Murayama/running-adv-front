@@ -1,0 +1,69 @@
+## フロントエンド
+- **Next.js (App Router)**
+  - LP・認証画面・マイページの構築
+  - App RouterベースでRSCを活用
+- **TypeScript**
+  - 型安全な開発
+- **UI**
+  - MUIを主に活用
+  - Tailwind CSSも併用
+- **i18n**
+  - `@nuxtjs/i18n` の経験を活かし、Next用ライブラリで拡張予定
+
+## バックエンド
+- **Nest.js**
+  - REST API・認証処理
+  - MVCライクな構造でエンティティ/DTOを明確化
+- **認証**
+  - Passport.js + LocalStrategy
+  - サインアップ／ログイン／ログアウト
+  - メール検証（MailHogで開発、将来はSendGrid/Resendへ移行）
+  - セッション管理
+- **ORM**
+  - Prisma
+  - PostgreSQL接続
+
+## インフラ
+- **Docker Compose**
+  - app / db / mailhog のマルチサービス構成
+- **DB**
+  - PostgreSQL
+- **クラウド**
+  - AWSにデプロイ（Amplify / App runner）
+
+## 開発体験
+- **Lint/Format**
+  - ESLint + Prettier
+- **型検証**
+  - ZodでAPIレスポンスをバリデーション
+- **テスト**
+  - Jest（単体）
+  - Supertest（API結合）
+- **ログ/監視**
+  - 開発：コンソール＋MailHog
+  - 本番：Sentry, UptimeRobotを検討
+- **AI駆動開発**
+  - コード生成やレビューにCopilot/ChatGPTを活用
+
+---
+
+## フェーズごとの技術到達点
+- **フェーズ1** （現在地）
+  - LP公開
+  - LP内の情報をAPIで取得（ランナーの情報）
+
+- **フェーズ1+** （下記は実装しているが、事業のフェーズ１では不要）
+  - 認証（サインアップ／ログイン／ログアウト）
+  - マイページ表示
+
+- **フェーズ2**  
+  - 複数ランナー管理
+  - ランナー一覧・詳細ページ
+  - 広告枠管理機能
+  - 団体向けプラン
+
+- **フェーズ3**  
+  - マッチングプラットフォーム
+  - 決済・契約管理
+  - 広告主向け管理画面
+  - インフラの拡張（AWSのサービスを活用してカスタマイズ）
