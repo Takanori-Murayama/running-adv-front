@@ -1,6 +1,4 @@
 'use client';
-
-import Image from 'next/image';
 import { Box, Container, List, ListItem, ListItemButton } from '@mui/material';
 import { MenuItem } from '@/app/type';
 import React from 'react';
@@ -9,7 +7,7 @@ export default function Footer({ mainMenuItems }: { mainMenuItems: MenuItem[] })
   return (
     <Box sx={{ width: '100%', padding: "2rem", backgroundColor: 'primary.main' }}>
       <Container maxWidth="lg" sx={{ margin: '0 auto', textAlign: 'center', color: 'white' }}>
-        <Image src="/logo-white.png" alt="ロゴ" width={200} height={100} style={{ margin: '0 auto', width: 'auto', height: '50px' }} />
+        {/* <Image src="/logo-white.png" alt="ロゴ" width={200} height={100} style={{ margin: '0 auto', width: 'auto', height: '50px' }} /> */}
         <List component="ul" sx={{ display: 'flex', justifyContent: 'center', padding: 0, marginTop: '1rem' }}>
           {mainMenuItems.map((link) => (
             <React.Fragment key={link.label}>

@@ -36,22 +36,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["AuthController_getProfile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/login": {
         parameters: {
             query?: never;
@@ -75,9 +59,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["AuthController_logout"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["AuthController_logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -100,6 +84,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["UsersController_updateProfile"];
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -109,7 +109,7 @@ export interface paths {
         };
         get: operations["UsersController_findAll"];
         put?: never;
-        post: operations["UsersController_create"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -129,7 +129,7 @@ export interface paths {
         delete: operations["UsersController_remove"];
         options?: never;
         head?: never;
-        patch: operations["UsersController_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/runners": {
@@ -168,12 +168,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AuthUserDto: {
-            id?: string;
-            email?: string;
-            displayName?: string;
-            photoUrl?: string;
-        };
         LoginDto: {
             /** Format: email */
             email: string;
@@ -184,18 +178,82 @@ export interface components {
             email: string;
             displayName: string;
             password: string;
+            /**
+             * @default RUNNER
+             * @enum {string}
+             */
+            category: "RUNNER" | "CYCLIST" | "WALKER";
+            /**
+             * @default USER
+             * @enum {string}
+             */
+            role: "ADMIN" | "USER";
         };
-        UserDto: {
-            id: string;
-            email: string;
+        AuthUserDto: {
+            id?: string;
+            email?: string;
             displayName?: string;
             photoUrl?: string;
+            /** @enum {string} */
+            category?: "RUNNER" | "CYCLIST" | "WALKER";
+            /** @enum {string} */
+            role?: "ADMIN" | "USER";
+        };
+        ListUsersQueryDto: {
+            /**
+             * @description ユーザーの役割でフィルタリング（ADMIN | USER）
+             * @example USER
+             * @enum {string}
+             */
+            role?: "ADMIN" | "USER";
+            /**
+             * @description ユーザーのカテゴリでフィルタリング（RUNNER | CYCLIST | WALKER）
+             * @example RUNNER
+             * @enum {string}
+             */
+            category?: "RUNNER" | "CYCLIST" | "WALKER";
+        };
+        PublicUserDto: {
+            /** @description ユーザーID */
+            id: string;
+            /** @description メールアドレス */
+            email: string;
+            /** @description 表示名 */
+            displayName: string;
+            /** @description プロフィール画像URL */
+            photoUrl?: string;
+            /**
+             * @description ユーザーの役割（ADMIN | USER）
+             * @enum {string}
+             */
+            role: "ADMIN" | "USER";
+            /**
+             * @description ユーザーのカテゴリ（RUNNER | CYCLIST | WALKER）
+             * @enum {string}
+             */
+            category: "RUNNER" | "CYCLIST" | "WALKER";
+            /** @description アクティブかどうか */
+            isActive: boolean;
+            /**
+             * Format: date-time
+             * @description 作成日時
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 更新日時
+             */
+            updatedAt: string;
         };
         UpdateUserDto: {
             id?: string;
             email?: string;
             displayName?: string;
             photoUrl?: string;
+            /** @enum {string} */
+            category?: "RUNNER" | "CYCLIST" | "WALKER";
+            /** @enum {string} */
+            role?: "ADMIN" | "USER";
         };
         CreateRunnerDto: {
             displayName: string;
@@ -258,25 +316,6 @@ export interface operations {
             };
         };
     };
-    AuthController_getProfile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuthUserDto"];
-                };
-            };
-        };
-    };
     AuthController_login: {
         parameters: {
             query?: never;
@@ -307,7 +346,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -338,7 +377,7 @@ export interface operations {
             };
         };
     };
-    UsersController_findAll: {
+    UsersController_getProfile: {
         parameters: {
             query?: never;
             header?: never;
@@ -347,17 +386,18 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description 現在ログイン中のユーザー情報を取得 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["PublicUserDto"];
                 };
             };
         };
     };
-    UsersController_create: {
+    UsersController_updateProfile: {
         parameters: {
             query?: never;
             header?: never;
@@ -366,16 +406,42 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserDto"];
+                "application/json": components["schemas"]["UpdateUserDto"];
             };
         };
         responses: {
-            201: {
+            /** @description プロフィール更新成功 */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["PublicUserDto"];
+                };
+            };
+        };
+    };
+    UsersController_findAll: {
+        parameters: {
+            query?: {
+                /** @description ユーザーの役割でフィルタリング（ADMIN | USER） */
+                role?: "ADMIN" | "USER";
+                /** @description ユーザーのカテゴリでフィルタリング（RUNNER | CYCLIST | WALKER） */
+                category?: "RUNNER" | "CYCLIST" | "WALKER";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ユーザー一覧取得（role、categoryでフィルタリング可能） */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicUserDto"][];
                 };
             };
         };
@@ -391,12 +457,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description 特定ユーザー情報取得 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string;
+                    "application/json": components["schemas"]["PublicUserDto"];
                 };
             };
         };
@@ -412,38 +479,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description ユーザー削除（将来的に管理者権限必要） */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": string;
-                };
-            };
-        };
-    };
-    UsersController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": string;
-                };
+                content?: never;
             };
         };
     };
