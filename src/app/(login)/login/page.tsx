@@ -1,40 +1,31 @@
-'use client';
-import { LoginButton } from '@/components/parts/AuthButtons';
-import { apiFetch } from '@/lib/fetch';
-import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Stack, Typography } from '@mui/material';
+import LoginForm from './_components/form';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function LoginPage() {
-  const [mail, setMail] = useState('');
-  const [password, setPassword] = useState('');
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!; // 例: http://localhost:3030
 
-  const submit = async () => {
-    alert(`メール: ${mail}\nパスワード: ${password}`);
-    try {
-      await apiFetch('/api/auth/login', {
-        method: 'post',
-        body: { email: mail, password: password },
-      });
-    } catch (error) {
-      console.error(error);
-    }
+export default async function LoginPage() {
+
+  const headerObj = await headers();
+  const cookie = headerObj.get('cookie') || '';
+    // 認証確認（キャッシュさせない）
+  const res = await fetch(`${API_BASE}/api/auth/me`, {
+    method: 'GET',
+    headers: { cookie },
+    // サーバfetchなので credentials は不要。Cookieは明示的に渡す。
+    cache: 'no-store',
+  });
+
+  if (res.ok) {
+    // 既ログインなら /mypage へ
+    redirect('/mypage');
   }
 
   return (
     <Stack spacing={4} sx={{ p: 6 }}>
       <Typography variant="h2">Login</Typography>
-      <Stack spacing={6} direction="column">
-        <Stack spacing={2} direction="column">
-          <TextField value={mail} onChange={(e) => setMail(e.target.value)} type="email" label="Email" />
-          <TextField value={password} onChange={(e) => setPassword(e.target.value)} type="password" label="Password" />
-          <Button variant="contained" onClick={submit}>ログイン</Button>
-        </Stack>
-        <Box border={1} sx={{ p:2, mt: 2, width: '100%' }}>
-          <Typography variant="body1" gutterBottom>SNSログイン</Typography>
-          <LoginButton />
-        </Box>
-      </Stack>
-      <Link href="/mypage">マイページ</Link>
+      <LoginForm />
     </Stack>
   );
 }
